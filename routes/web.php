@@ -1,7 +1,9 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use App\Models\User;
+use App\DataTables\UsersDataTable;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,8 +20,18 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
+Route::get('user/{id}/edit', function ($id) {
+    $user = User::findOrFail($id);
+    return view('user.edit', compact('user'));
+})->name('user.edit');
+Route::get('user/{id}/destroy', function ($id) {
+    $user = User::findOrFail($id);
+    $user->delete();
+    return redirect()->route('dashboard');
+})->name('user.destroy');
+
+Route::get('/dashboard', function (UsersDataTable $dataTable) {
+    return $dataTable->render('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
