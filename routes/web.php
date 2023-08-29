@@ -4,7 +4,7 @@ use App\Models\User;
 use App\DataTables\UsersDataTable;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
-
+use Intervention\Image\ImageManagerStatic as Image;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -33,6 +33,13 @@ Route::get('user/{id}/destroy', function ($id) {
 Route::get('/dashboard', function (UsersDataTable $dataTable) {
     return $dataTable->render('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('image', function () {
+    $img = Image::make('https://picsum.photos/200/300');
+    $img->filter(new \App\Helpers\ImageFilter(80));
+
+    return $img->response('jpg');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
