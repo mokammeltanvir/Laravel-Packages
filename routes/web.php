@@ -1,10 +1,13 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Str;
 use App\DataTables\UsersDataTable;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
+use Laravel\Socialite\Facades\Socialite;
 use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\ProfileController;
 use Intervention\Image\ImageManagerStatic as Image;
@@ -72,6 +75,28 @@ Route::get('create-role', function () {
 
     return $user;
 
+});
+
+// Socialite login route
+Route::get('/auth/redirect', function () {
+    return Socialite::driver('github')->redirect();
+})->name('login.github');
+ 
+Route::get('/auth/callback', function () {
+    $user = Socialite::driver('github')->user();
+
+    $user = User::firstOrCreate([
+        'email' => $user->email
+    ], [
+        'name' => $user->name,
+        'password' => bcrypt(Str::random(24))
+    ]);
+
+    Auth::login($user, true);
+    return redirect()->route('dashboard');
+ 
+    // dd($user);
+    // $user->token
 });
 
 
