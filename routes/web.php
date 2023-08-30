@@ -2,8 +2,10 @@
 
 use App\Models\User;
 use App\DataTables\UsersDataTable;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
+use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\ProfileController;
 use Intervention\Image\ImageManagerStatic as Image;
 /*
@@ -55,5 +57,22 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+// Permission Roles
+Route::get('create-role', function () {
+    // $role = Role::create(['name' => 'publisher']);
+    // return $role;
+    // $permission = Permission::create(['name' => 'edit articles']);
+    // return $permission;
+
+    $user = auth()->user();
+    // $user->assignRole('writer');
+    $user->givePermissionTo('edit articles');
+
+
+    return $user;
+
+});
+
 
 require __DIR__.'/auth.php';
